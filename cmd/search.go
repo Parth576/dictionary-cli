@@ -20,7 +20,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"sort"
 
+	"github.com/Parth576/gowords/colors"
 	"github.com/spf13/cobra"
 )
 
@@ -49,13 +51,11 @@ func init() {
 
 func searchInDict(word string) {
 	var reqURL = "https://api.dictionaryapi.dev/api/v2/entries/en_US/" + word
-	//fmt.Println(reqURL)
 	res, err := http.Get(reqURL)
 	PrintErr(err)
 	defer res.Body.Close()
 	var result interface{}
 	body, err := ioutil.ReadAll(res.Body)
-	//fmt.Println(string(body))
 	PrintErr(err)
 	if res.StatusCode == 200 {
 		err = json.Unmarshal(body, &result)
@@ -66,31 +66,35 @@ func searchInDict(word string) {
 		switch meaning := meaning.(type) {
 		case []interface{}:
 			for _, v := range meaning {
-				//fmt.Println(v)
-				//fmt.Println()
-				for k, v := range v.(map[string]interface{}) {
-					fmt.Println(k)
-					fmt.Println(v)
+				defs := v.(map[string]interface{})
+				keys := make([]string, 0)
+				for k, _ := range defs {
+					keys = append(keys, k)
+				}
+				sort.Strings(keys)
+				reverse(keys)
+				for _, key := range keys {
+					if key == "partOfSpeech" {
+						fmt.Printf("%s%s%s\n", colors.Cyan, defs[key], colors.Reset)
+					} else if key == "definitions" {
+						fmt.Printf("%s\n\n", defs[key].([]interface{})[0].(map[string]interface{})["definition"])
+					}
 				}
 			}
 		}
 
-		//switch reflect.TypeOf(meaning).Kind() {
-		//case reflect.Slice:
-		//	s := reflect.ValueOf(meaning)
-		//	for i := 0; i < s.Len(); i++ {
-		//		fmt.Println(s.Index(i))
-		//	}
-		//}
-
-		//for k, v := range meaning["meanings"].([]interface{})[1].(map[string]interface{}) {
-		//	fmt.Println("key is " + k)
-		//	fmt.Println(v)
-		//	fmt.Println("----")
-		//}
-		//fmt.Println(result)
 	} else if res.StatusCode == 429 {
 		fmt.Println("API Rate Limit reached. Please try again after some time.")
+	} else if res.StatusCode == 404 {
+		fmt.Println("No definition found for " + word)
+		//Give option to manually enter definition
 	}
 
+}
+
+func reverse(ss []string) {
+	last := len(ss) - 1
+	for i := 0; i < len(ss)/2; i++ {
+		ss[i], ss[last-i] = ss[last-i], ss[i]
+	}
 }
