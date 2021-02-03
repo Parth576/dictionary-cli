@@ -21,6 +21,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"sort"
+	"strings"
 
 	"github.com/Parth576/gowords/colors"
 	"github.com/spf13/cobra"
@@ -75,9 +76,13 @@ func searchInDict(word string) {
 				reverse(keys)
 				for _, key := range keys {
 					if key == "partOfSpeech" {
-						fmt.Printf("%s%s%s\n", colors.Cyan, defs[key], colors.Reset)
+						fmt.Printf("%s%s%s\n", colors.Cyan, strings.ToUpper(defs[key].(string)), colors.Reset)
 					} else if key == "definitions" {
-						fmt.Printf("%s\n\n", defs[key].([]interface{})[0].(map[string]interface{})["definition"])
+						//fmt.Printf("%s\n\n", defs[key].([]interface{})[0].(map[string]interface{})["definition"])
+						for _, j := range defs[key].([]interface{}) {
+							fmt.Printf("%s\u279C%s%s%s\n", colors.Blue, " ", colors.Reset, j.(map[string]interface{})["definition"])
+						}
+						fmt.Println()
 					}
 				}
 			}
