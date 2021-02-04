@@ -1,5 +1,5 @@
 /*
-Copyright © 2021 NAME HERE <EMAIL ADDRESS>
+Copyright © 2021 Parth Shah parthshah576@gmail.com
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import (
 
 	"github.com/Parth576/gowords/colors"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // searchCmd represents the search command
@@ -32,22 +33,24 @@ var searchCmd = &cobra.Command{
 	Use:   "search",
 	Short: "search word using an online dictionary",
 	Run: func(cmd *cobra.Command, args []string) {
-		searchInDict(args[0])
+		if cacheSearch := viper.Get(args[0]); cacheSearch != nil {
+			//fmt.Println("Fetching definition from cache...")
+			for k, v := range cacheSearch.(map[string]interface{}) {
+				fmt.Printf("%s%s%s\n", colors.Cyan, strings.ToUpper(k), colors.Reset)
+				for _, def := range v.([]interface{}) {
+					fmt.Printf("%s\u279C%s%s%s\n", colors.Blue, " ", colors.Reset, def)
+				}
+				fmt.Println()
+			}
+		} else {
+			//fmt.Println("Fetching definition from API...")
+			searchInDict(args[0])
+		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(searchCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// searchCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// searchCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
 func searchInDict(word string) {
@@ -63,6 +66,7 @@ func searchInDict(word string) {
 		PrintErr(err)
 		var r = result.([]interface{})[0].(map[string]interface{})
 		var meaning = r["meanings"]
+		cacheSave := make(map[string][]interface{})
 
 		switch meaning := meaning.(type) {
 		case []interface{}:
@@ -74,19 +78,29 @@ func searchInDict(word string) {
 				}
 				sort.Strings(keys)
 				reverse(keys)
+				pos := ""
 				for _, key := range keys {
 					if key == "partOfSpeech" {
-						fmt.Printf("%s%s%s\n", colors.Cyan, strings.ToUpper(defs[key].(string)), colors.Reset)
+						posTemp := defs[key].(string)
+						fmt.Printf("%s%s%s\n", colors.Cyan, strings.ToUpper(posTemp), colors.Reset)
+						pos = posTemp
 					} else if key == "definitions" {
 						//fmt.Printf("%s\n\n", defs[key].([]interface{})[0].(map[string]interface{})["definition"])
 						for _, j := range defs[key].([]interface{}) {
-							fmt.Printf("%s\u279C%s%s%s\n", colors.Blue, " ", colors.Reset, j.(map[string]interface{})["definition"])
+							defTemp := j.(map[string]interface{})["definition"]
+							fmt.Printf("%s\u279C%s%s%s\n", colors.Blue, " ", colors.Reset, defTemp)
+							cacheSave[pos] = append(cacheSave[pos], defTemp)
 						}
 						fmt.Println()
 					}
 				}
 			}
 		}
+		wordListTemp := viper.GetStringSlice("wordList")
+		wordListTemp = append(wordListTemp, word)
+		viper.Set("wordList", wordListTemp)
+		viper.Set(word, cacheSave)
+		viper.WriteConfig()
 
 	} else if res.StatusCode == 429 {
 		fmt.Println("API Rate Limit reached. Please try again after some time.")

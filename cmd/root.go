@@ -1,5 +1,5 @@
 /*
-Copyright © 2021 NAME HERE <EMAIL ADDRESS>
+Copyright © 2021 Parth Shah parthshah576@gmail.com
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,21 +19,14 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/user"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var cfgFile string
-
-var Reset = "\033[0m"
-var Red = "\033[31m"
-var Green = "\033[32m"
-var Yellow = "\033[33m"
-var Blue = "\033[34m"
-var Purple = "\033[35m"
-var Cyan = "\033[36m"
-var Gray = "\033[37m"
-var White = "\033[97m"
 
 // PrintErr is used to print the errors to error log
 func PrintErr(e error) {
@@ -51,9 +44,38 @@ var rootCmd = &cobra.Command{
 	//	Run: func(cmd *cobra.Command, args []string) { },
 }
 
+func initConfig() {
+	usr, err := user.Current()
+	if err != nil {
+		log.Fatal(err)
+	}
+	configPath := filepath.Join(usr.HomeDir, "gowords.json")
+	_, err = os.Stat(configPath)
+	if os.IsNotExist(err) {
+		var file, err = os.Create(configPath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer file.Close()
+	}
+	viper.SetConfigFile(configPath)
+	//viper.SetDefault("hello", map[string][]interface{}{"EXCLAMATION": []interface{}{"Used as a greeting or to begin a phone conversation."}, "NOUN": []interface{}{"An utterance of \"hello\"; a greeting."}, "INTRANSITIVE VERB": []interface{}{"Say or shout \"hello\"; greet someone."}})
+	viper.SetDefault("wordList", []string{})
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			fmt.Println("could not find config file")
+		} else {
+			//fmt.Println(err)
+		}
+	}
+	viper.WriteConfig()
+	//viper.WatchConfig()
+}
+
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
+	initConfig()
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
