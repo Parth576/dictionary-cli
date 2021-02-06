@@ -31,7 +31,7 @@ import (
 // searchCmd represents the search command
 var searchCmd = &cobra.Command{
 	Use:   "search",
-	Short: "search word using an online dictionary",
+	Short: "Search definition for any word using an online dictionary, Example: goword search hello",
 	Run: func(cmd *cobra.Command, args []string) {
 		if cacheSearch := viper.Get(args[0]); cacheSearch != nil {
 			//fmt.Println("Fetching definition from cache...")
