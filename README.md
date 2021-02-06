@@ -1,6 +1,33 @@
 # dictionary-cli
 CLI wrapper for dictionaryapi.dev. Currently can search for only english definitions.
 
+## Installation 
+
+#### For Linux / macOS
+
+- Download the binary file from github releases (darwin-amd64 is the macOS release)
+```bash
+wget https://github.com/Parth576/dictionary-cli/releases/download/0.0.2/gowords-linux-amd64
+```
+- Make the binary executable
+```bash
+chmod +x /path/to/binary/gowords-linux-amd64
+./path/to/binary/gowords-linux-amd64 search
+```
+- Using alias in ~/.bashrc
+```bash
+alias gowords = /path/to/binary/gowords-linux-amd64
+```
+
+#### For Windows
+
+- Download the windows release (.exe extension)
+- In Powershell / cmd, navigate to the folder where the binary is downloaded
+```bash
+.\gowords-windows-amd64.exe help
+```
+
+
 ## Features
 
 - Search for definitions by word
