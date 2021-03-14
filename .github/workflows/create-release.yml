@@ -1,0 +1,61 @@
+name: Build and create release
+on:
+  push:
+    tags:
+      - 'v*'
+jobs: 
+  build:
+    name: Create and upload release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.16'
+      - name: Build binaries 
+        run: |
+          env GOOS=linux GOARCH=amd64 go build -o gowords-linux github.com/Parth576/gowords
+          env GOOS=windows GOARCH=amd64 go build -o gowords-windows github.com/Parth576/gowords
+          env GOOS=darwin GOARCH=amd64 go build -o gowords-macos github.com/Parth576/gowords
+      - name: Create a new release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          draft: false
+          prerelease: false
+      - name: Upload linux binary
+        id: upload-linux-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./gowords-linux
+          asset_name: gowords-linux
+          asset_content_type: application/octet-stream
+      - name: Upload windows binary
+        id: upload-windows-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./gowords-windows
+          asset_name: gowords-windows
+          asset_content_type: application/octet-stream
+      - name: Upload macos binary
+        id: upload-linux-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./gowords-macos
+          asset_name: gowords-macos
+          asset_content_type: application/octet-stream
