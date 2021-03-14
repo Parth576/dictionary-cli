@@ -28,6 +28,8 @@ import (
 
 var numberOfDefs int
 
+type dataStruct struct{}
+
 // randomCmd represents the random command
 var randomCmd = &cobra.Command{
 	Use:   "random",
@@ -60,12 +62,14 @@ var randomCmd = &cobra.Command{
 func getPageContent(index int, wordList []string) string {
 	definition := viper.Get(wordList[index])
 	resultString := ""
-	for k, v := range definition.(map[string]interface{}) {
-		resultString += fmt.Sprintf("%s%s%s\n", colors.Cyan, strings.ToUpper(k), colors.Reset)
-		for _, def := range v.([]interface{}) {
-			resultString += fmt.Sprintf("%s\u279C%s%s%s\n", colors.Blue, " ", colors.Reset, def)
+	if definition != nil {
+		for k, v := range definition.(map[string]interface{}) {
+			resultString += fmt.Sprintf("%s%s%s\n", colors.Cyan, strings.ToUpper(k), colors.Reset)
+			for _, def := range v.([]interface{}) {
+				resultString += fmt.Sprintf("%s\u279C%s%s%s\n", colors.Blue, " ", colors.Reset, def)
+			}
+			resultString += "\n"
 		}
-		resultString += "\n"
 	}
 	return resultString
 }
