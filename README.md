@@ -6,8 +6,9 @@ CLI wrapper for dictionaryapi.dev. Currently can search for only english definit
 #### For Linux / macOS
 
 - Download the binary file from github releases (darwin-amd64 is the macOS release)
+- Latest version can be found on the [releases](https://github.com/Parth576/dictionary-cli/releases/latest) page
 ```bash
-wget https://github.com/Parth576/dictionary-cli/releases/download/0.0.2/gowords-linux-amd64
+wget https://github.com/Parth576/dictionary-cli/releases/download/<version>/gowords-linux-amd64
 ```
 - Make the binary executable
 ```bash
