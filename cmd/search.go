@@ -38,7 +38,11 @@ var searchCmd = &cobra.Command{
 			for k, v := range cacheSearch.(map[string]interface{}) {
 				fmt.Printf("%s%s%s\n", colors.Cyan, strings.ToUpper(k), colors.Reset)
 				for _, def := range v.([]interface{}) {
-					fmt.Printf("%s\u279C%s%s%s\n", colors.Blue, " ", colors.Reset, def)
+					if strings.HasPrefix(def.(string), "68f3fde1-8c1a-49eb-9f27-8d951b049142") {
+						fmt.Printf("%s\u2605%s%s%s\n", colors.Yellow, " ", colors.Reset, def.(string)[36:])
+					} else {
+						fmt.Printf("%s\u279C%s%s%s\n", colors.Blue, " ", colors.Reset, def)
+					}
 				}
 				fmt.Println()
 			}
@@ -88,8 +92,11 @@ func searchInDict(word string) {
 						//fmt.Printf("%s\n\n", defs[key].([]interface{})[0].(map[string]interface{})["definition"])
 						for _, j := range defs[key].([]interface{}) {
 							defTemp := j.(map[string]interface{})["definition"]
+							example := j.(map[string]interface{})["example"]
 							fmt.Printf("%s\u279C%s%s%s\n", colors.Blue, " ", colors.Reset, defTemp)
+							fmt.Printf("%s\u2605%s%s%s\n", colors.Yellow, " ", colors.Reset, example)
 							cacheSave[pos] = append(cacheSave[pos], defTemp)
+							cacheSave[pos] = append(cacheSave[pos], "68f3fde1-8c1a-49eb-9f27-8d951b049142"+example.(string))
 						}
 						fmt.Println()
 					}
