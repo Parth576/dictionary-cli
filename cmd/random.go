@@ -22,13 +22,17 @@ import (
 	"time"
 
 	"github.com/Parth576/gowords/colors"
+	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 var numberOfDefs int
 
-type dataStruct struct{}
+type dataStruct struct {
+	Word    string
+	Content string
+}
 
 // randomCmd represents the random command
 var randomCmd = &cobra.Command{
@@ -37,6 +41,7 @@ var randomCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		wordList := viper.GetStringSlice("wordList")
 		listLength := len(wordList)
+		data := []dataStruct{}
 
 		if numberOfDefs > listLength {
 			fmt.Printf("Cache only has %v words but number supplied was %v. \nPlease try again with a number which is in range.\n", listLength, numberOfDefs)
@@ -52,10 +57,28 @@ var randomCmd = &cobra.Command{
 					i++
 					completedWords[randomIndex] = struct{}{}
 					content := getPageContent(randomIndex, wordList)
-					fmt.Printf("\n~ %s%s%s ~\n\n%s\n\n", colors.Yellow, strings.ToUpper(wordList[randomIndex]), colors.Reset, content)
+					//fmt.Printf("\n~ %s%s%s ~\n\n%s\n\n", colors.Yellow, strings.ToUpper(wordList[randomIndex]), colors.Reset, content)
+					data = append(data, dataStruct{strings.ToUpper(wordList[randomIndex]), content})
 				}
 			}
 		}
+
+		templates := &promptui.SelectTemplates{
+			Label:    "{{ . }}",
+			Active:   "\u279C {{ .Word | yellow }}",
+			Inactive: "{{ .Word | yellow }}",
+			Selected: "Thanks for using gowords!",
+			Details:  "\n{{ .Content }}",
+		}
+
+		prompt := promptui.Select{
+			Label:     "Press ENTER to exit",
+			Items:     data,
+			Templates: templates,
+			Size:      10,
+		}
+		_, _, err := prompt.Run()
+		PrintErr(err)
 	},
 }
 
@@ -66,7 +89,11 @@ func getPageContent(index int, wordList []string) string {
 		for k, v := range definition.(map[string]interface{}) {
 			resultString += fmt.Sprintf("%s%s%s\n", colors.Cyan, strings.ToUpper(k), colors.Reset)
 			for _, def := range v.([]interface{}) {
-				resultString += fmt.Sprintf("%s\u279C%s%s%s\n", colors.Blue, " ", colors.Reset, def)
+				if strings.HasPrefix(def.(string), "68f3fde1-8c1a-49eb-9f27-8d951b049142") {
+					resultString += fmt.Sprintf("%s\u2605%s%s%s\n", colors.Yellow, " ", colors.Reset, def.(string)[36:])
+				} else {
+					resultString += fmt.Sprintf("%s\u279C%s%s%s\n", colors.Blue, " ", colors.Reset, def)
+				}
 			}
 			resultString += "\n"
 		}

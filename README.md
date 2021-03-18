@@ -1,5 +1,5 @@
 # dictionary-cli
-CLI wrapper for dictionaryapi.dev. Currently can search for only english definitions.
+CLI wrapper for [dictionaryapi.dev](https://dictionaryapi.dev/). Currently can search for only english definitions.
 
 ## Installation 
 
