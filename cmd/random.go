@@ -67,7 +67,7 @@ var randomCmd = &cobra.Command{
 			Label:    "{{ . }}",
 			Active:   "\u279C {{ .Word | yellow }}",
 			Inactive: "{{ .Word | yellow }}",
-			Selected: "Thanks for using gowords!",
+			Selected: " ",
 			Details:  "\n{{ .Content }}",
 		}
 

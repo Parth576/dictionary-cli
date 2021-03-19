@@ -92,11 +92,13 @@ func searchInDict(word string) {
 						//fmt.Printf("%s\n\n", defs[key].([]interface{})[0].(map[string]interface{})["definition"])
 						for _, j := range defs[key].([]interface{}) {
 							defTemp := j.(map[string]interface{})["definition"]
-							example := j.(map[string]interface{})["example"]
+							example, exampleExists := j.(map[string]interface{})["example"]
 							fmt.Printf("%s\u279C%s%s%s\n", colors.Blue, " ", colors.Reset, defTemp)
-							fmt.Printf("%s\u2605%s%s%s\n", colors.Yellow, " ", colors.Reset, example)
 							cacheSave[pos] = append(cacheSave[pos], defTemp)
-							cacheSave[pos] = append(cacheSave[pos], "68f3fde1-8c1a-49eb-9f27-8d951b049142"+example.(string))
+							if exampleExists {
+								fmt.Printf("%s\u2605%s%s%s\n", colors.Yellow, " ", colors.Reset, example)
+								cacheSave[pos] = append(cacheSave[pos], "68f3fde1-8c1a-49eb-9f27-8d951b049142"+example.(string))
+							}
 						}
 						fmt.Println()
 					}
