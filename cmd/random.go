@@ -45,6 +45,8 @@ var randomCmd = &cobra.Command{
 
 		if numberOfDefs > listLength {
 			fmt.Printf("Cache only has %v words but number supplied was %v. \nPlease try again with a number which is in range.\n", listLength, numberOfDefs)
+		} else if numberOfDefs <= 0 {
+			fmt.Println("Please enter a valid number.")
 		} else {
 			rand.Seed(time.Now().Unix())
 			completedWords := make(map[int]struct{}, listLength)
@@ -61,24 +63,25 @@ var randomCmd = &cobra.Command{
 					data = append(data, dataStruct{strings.ToUpper(wordList[randomIndex]), content})
 				}
 			}
+
+			templates := &promptui.SelectTemplates{
+				Label:    "{{ . }}",
+				Active:   "\u279C {{ .Word | yellow }}",
+				Inactive: "{{ .Word | yellow }}",
+				Selected: " ",
+				Details:  "\n{{ .Content }}",
+			}
+
+			prompt := promptui.Select{
+				Label:     "Press ENTER to exit",
+				Items:     data,
+				Templates: templates,
+				Size:      10,
+			}
+			_, _, err := prompt.Run()
+			PrintErr(err)
 		}
 
-		templates := &promptui.SelectTemplates{
-			Label:    "{{ . }}",
-			Active:   "\u279C {{ .Word | yellow }}",
-			Inactive: "{{ .Word | yellow }}",
-			Selected: " ",
-			Details:  "\n{{ .Content }}",
-		}
-
-		prompt := promptui.Select{
-			Label:     "Press ENTER to exit",
-			Items:     data,
-			Templates: templates,
-			Size:      10,
-		}
-		_, _, err := prompt.Run()
-		PrintErr(err)
 	},
 }
 
