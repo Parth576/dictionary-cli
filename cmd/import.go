@@ -43,6 +43,7 @@ var importCmd = &cobra.Command{
 			PrintErr(err)
 			bar := pb.Default.Start(len(lines))
 			newWordCounter := 0
+			errLog := ""
 			for _, word := range lines {
 				if cacheSearch := viper.Get(word); cacheSearch != nil {
 					//def found in cache, so pass
@@ -67,13 +68,15 @@ var importCmd = &cobra.Command{
 						break
 					} else if res.StatusCode == 404 {
 						//no word def found
-						fmt.Printf("No definition found for %s\n", word)
+						wordNotFound := fmt.Sprintf("No definition found for %s\n", word)
+						errLog += wordNotFound
 						bar.Increment()
 					}
 				}
 			}
-			fmt.Printf("Imported %v new words!", newWordCounter)
 			bar.Finish()
+			fmt.Printf("Imported %v new words!", newWordCounter)
+			fmt.Printf("%s", errLog)
 		}
 	},
 }
