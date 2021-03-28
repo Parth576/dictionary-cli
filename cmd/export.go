@@ -37,8 +37,12 @@ var exportCmd = &cobra.Command{
 		PrintErr(err)
 		defer file.Close()
 		wordListTemp := viper.GetStringSlice("wordList")
-		for _, line := range wordListTemp {
-			file.WriteString(line + "\n")
+		for index, line := range wordListTemp {
+			if index == len(wordListTemp)-1 {
+				file.WriteString(line)
+			} else {
+				file.WriteString(line + "\n")
+			}
 		}
 		fmt.Printf("Wordlist successfully written to %s", listFilepath)
 	},

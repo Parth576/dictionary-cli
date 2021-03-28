@@ -75,7 +75,7 @@ var importCmd = &cobra.Command{
 				}
 			}
 			bar.Finish()
-			fmt.Printf("Imported %v new words!", newWordCounter)
+			fmt.Printf("Imported %v new words.\n", newWordCounter)
 			fmt.Printf("%s", errLog)
 		}
 	},
