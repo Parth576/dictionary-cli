@@ -3,9 +3,9 @@ CLI wrapper for [dictionaryapi.dev](https://dictionaryapi.dev/). Search for word
 
 ## Installation 
 
-### For Arch Linux/ Arch based distributions
+### For Arch Linux/ Arch based distributions [Recommended]
 
-- There is a [gowords package](https://aur.archlinux.org/packages/gowords) on the AUR (Arch User Repository)
+- There is a [gowords package](https://aur.archlinux.org/packages/gowords) in the AUR (Arch User Repository)
 - The package can be easily installed using an AUR helper, for example: yay
 ```bash
 yay -S gowords
@@ -40,11 +40,25 @@ chmod +x /path/to/binary/gowords-linux-amd64
 gowords search <word>
 gowords search obsequious
 ```
-- Print random 'n' words and their definitions from cache
-
+- Flashcards like wordlist to build your vocabulary
 ```bash
+gowords random
 gowords random --number 5  
 gowords random -n 3
 ```
 
-- Definitions are cached at ~/gowords.json
+- Export your wordlist to share it with someone or to back it up
+```bash
+gowords export
+```
+
+- Import any wordlist (Format: Single word on every line)
+```bash
+gowords import <filepath>
+gowords import wordlist.txt
+```
+
+- Delete any word from wordlist
+```bash
+gowords delete <word>
+```
