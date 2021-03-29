@@ -39,6 +39,12 @@ or do not need to be practiced anymore.`,
 			if cacheSearch := viper.Get(args[0]); cacheSearch != nil {
 				err := Unset(args[0])
 				PrintErr(err)
+				wordList := viper.GetStringSlice("wordList")
+				wordList = remove(wordList, args[0])
+				viper.Set("wordList", wordList)
+				viper.WriteConfig()
+			} else {
+				fmt.Printf("%s not found in the wordlist.", args[0])
 			}
 		}
 	},
@@ -48,6 +54,7 @@ func init() {
 	rootCmd.AddCommand(deleteCmd)
 }
 
+// https://github.com/spf13/viper/issues/632#issuecomment-581597492
 func Unset(key string) error {
 	configMap := viper.AllSettings()
 	delete(configMap, key)
@@ -58,4 +65,14 @@ func Unset(key string) error {
 	}
 	viper.WriteConfig()
 	return nil
+}
+
+// https://stackoverflow.com/a/34070691/12370518
+func remove(s []string, r string) []string {
+	for i, v := range s {
+		if v == r {
+			return append(s[:i], s[i+1:]...)
+		}
+	}
+	return s
 }
