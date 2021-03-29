@@ -16,6 +16,7 @@ limitations under the License.
 package cmd
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 
@@ -51,7 +52,7 @@ func Unset(key string) error {
 	configMap := viper.AllSettings()
 	delete(configMap, key)
 	encodedConfig, _ := json.MarshalIndent(configMap, "", " ")
-	err := viper.ReadConfig(encodedConfig)
+	err := viper.ReadConfig(bytes.NewReader(encodedConfig))
 	if err != nil {
 		return err
 	}
