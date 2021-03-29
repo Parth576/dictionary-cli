@@ -3,7 +3,7 @@ CLI wrapper for [dictionaryapi.dev](https://dictionaryapi.dev/). Search for word
 
 ## Installation 
 
-### For Arch Linux/ Arch based distributions [Recommended]
+### For Arch Linux/ Arch based distributions
 
 - There is a [gowords package](https://aur.archlinux.org/packages/gowords) in the AUR (Arch User Repository)
 - The package can be easily installed using an AUR helper, for example: yay
