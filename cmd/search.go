@@ -41,7 +41,8 @@ var searchCmd = &cobra.Command{
 			if viper.IsSet(args[0]) {
 				// Fetching definition from cache
 				var cache []Meaning
-				viper.UnmarshalKey(args[0], &cache)
+				err := viper.UnmarshalKey(args[0], &cache)
+				PrintErr(err)
 				for _, v := range cache {
 					fmt.Printf("%s%s%s\n", colors.Cyan, strings.ToUpper(v.POS), colors.Reset)
 					for _, def := range v.Definitions {
@@ -101,11 +102,4 @@ func fetch(word string) {
 		//Give option to manually enter definition
 	}
 
-}
-
-func Reverse(ss []string) {
-	last := len(ss) - 1
-	for i := 0; i < len(ss)/2; i++ {
-		ss[i], ss[last-i] = ss[last-i], ss[i]
-	}
 }
