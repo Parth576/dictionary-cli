@@ -1,18 +1,3 @@
-/*
-Copyright © 2021 Parth Shah <parthshah576@gmail.com>
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
 package cmd
 
 import (
@@ -22,7 +7,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"sort"
 
 	"github.com/cheggaaa/pb/v3"
 	"github.com/spf13/cobra"
@@ -45,7 +29,7 @@ var importCmd = &cobra.Command{
 			newWordCounter := 0
 			errLog := ""
 			for _, word := range lines {
-				if cacheSearch := viper.Get(word); cacheSearch != nil {
+				if viper.IsSet(word) {
 					//def found in cache, so pass
 					bar.Increment()
 					continue
@@ -60,7 +44,7 @@ var importCmd = &cobra.Command{
 					if res.StatusCode == 200 {
 						//fetch from api and save in cache
 						fetchFromAPI(word, body)
-						newWordCounter += 1
+						newWordCounter++
 						bar.Increment()
 					} else if res.StatusCode == 429 {
 						//api rate limit reached, need to try again after some time
@@ -101,50 +85,16 @@ func init() {
 }
 
 func fetchFromAPI(word string, body []byte) {
-	var result interface{}
+	var result []Body
 	err := json.Unmarshal(body, &result)
 	PrintErr(err)
-	var r = result.([]interface{})[0].(map[string]interface{})
-	var meaning = r["meanings"]
-	cacheSave := make(map[string][]interface{})
-
-	switch meaning := meaning.(type) {
-	case []interface{}:
-		for _, v := range meaning {
-			defs := v.(map[string]interface{})
-			keys := make([]string, 0)
-			for k, _ := range defs {
-				keys = append(keys, k)
-			}
-			sort.Strings(keys)
-			Reverse(keys)
-			pos := ""
-			for _, key := range keys {
-				if key == "partOfSpeech" {
-					posTemp := defs[key].(string)
-					//fmt.Printf("%s%s%s\n", colors.Cyan, strings.ToUpper(posTemp), colors.Reset)
-					pos = posTemp
-				} else if key == "definitions" {
-					//fmt.Printf("%s\n\n", defs[key].([]interface{})[0].(map[string]interface{})["definition"])
-					for _, j := range defs[key].([]interface{}) {
-						defTemp := j.(map[string]interface{})["definition"]
-						example, exampleExists := j.(map[string]interface{})["example"]
-						//fmt.Printf("%s\u279C%s%s%s\n", colors.Blue, " ", colors.Reset, defTemp)
-						cacheSave[pos] = append(cacheSave[pos], defTemp)
-						if exampleExists {
-							//fmt.Printf("%s\u2605%s%s%s\n", colors.Yellow, " ", colors.Reset, example)
-							cacheSave[pos] = append(cacheSave[pos], "68f3fde1-8c1a-49eb-9f27-8d951b049142"+example.(string))
-						}
-					}
-					//fmt.Println()
-				}
-			}
-		}
+	var cacheSave []Meaning
+	for _, val := range result {
+		cacheSave = val.Meanings
 	}
 	wordListTemp := viper.GetStringSlice("wordList")
 	wordListTemp = append(wordListTemp, word)
 	viper.Set("wordList", wordListTemp)
 	viper.Set(word, cacheSave)
 	viper.WriteConfig()
-
 }

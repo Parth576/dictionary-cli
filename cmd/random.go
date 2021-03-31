@@ -1,18 +1,3 @@
-/*
-Copyright © 2021 Parth Shah parthshah576@gmail.com
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
 package cmd
 
 import (
@@ -59,7 +44,6 @@ var randomCmd = &cobra.Command{
 					i++
 					completedWords[randomIndex] = struct{}{}
 					content := getPageContent(randomIndex, wordList)
-					//fmt.Printf("\n~ %s%s%s ~\n\n%s\n\n", colors.Yellow, strings.ToUpper(wordList[randomIndex]), colors.Reset, content)
 					data = append(data, dataStruct{strings.ToUpper(wordList[randomIndex]), content})
 				}
 			}
@@ -86,20 +70,19 @@ var randomCmd = &cobra.Command{
 }
 
 func getPageContent(index int, wordList []string) string {
-	definition := viper.Get(wordList[index])
+	var cache []Meaning
+	err := viper.UnmarshalKey(wordList[index], &cache)
+	PrintErr(err)
 	resultString := ""
-	if definition != nil {
-		for k, v := range definition.(map[string]interface{}) {
-			resultString += fmt.Sprintf("%s%s%s\n", colors.Cyan, strings.ToUpper(k), colors.Reset)
-			for _, def := range v.([]interface{}) {
-				if strings.HasPrefix(def.(string), "68f3fde1-8c1a-49eb-9f27-8d951b049142") {
-					resultString += fmt.Sprintf("%s\u2605%s%s%s\n", colors.Yellow, " ", colors.Reset, def.(string)[36:])
-				} else {
-					resultString += fmt.Sprintf("%s\u279C%s%s%s\n", colors.Blue, " ", colors.Reset, def)
-				}
+	for _, v := range cache {
+		resultString += fmt.Sprintf("%s%s%s\n", colors.Cyan, strings.ToUpper(v.POS), colors.Reset)
+		for _, def := range v.Definitions {
+			resultString += fmt.Sprintf("%s\u279C%s%s%s\n", colors.Blue, " ", colors.Reset, def.Definition)
+			if def.Example != "" {
+				resultString += fmt.Sprintf("%s\u2605%s%s%s\n", colors.Yellow, " ", colors.Reset, def.Example)
 			}
-			resultString += "\n"
 		}
+		resultString += "\n"
 	}
 	return resultString
 }
