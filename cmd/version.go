@@ -13,7 +13,7 @@ var versionCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		os := runtime.GOOS
 		arch := runtime.GOARCH
-		fmt.Printf("v0.0.7 %s/%s\n", os, arch)
+		fmt.Printf("v0.0.8 %s/%s\n", os, arch)
 	},
 }
 
