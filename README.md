@@ -1,5 +1,8 @@
 # dictionary-cli
-CLI wrapper for [dictionaryapi.dev](https://dictionaryapi.dev/). Search for word definitions and memorize words. Helpful for increasing your vocabulary.
+CLI wrapper for [dictionaryapi.dev](https://dictionaryapi.dev/). Search for word definitions and memorize words. Helpful for building your vocabulary.
+
+## Demo
+![demo](assets/gowords-demo.gif)
 
 ## Installation 
 
